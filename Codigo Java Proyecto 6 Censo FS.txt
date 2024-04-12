@@ -1,0 +1,154 @@
+//  https://onlinegdb.com/vKzwTpTDn
+
+
+
+// Clase principal para organizar el código
+public class Main {
+
+    // Interfaz Censo con un método de operación
+    public interface Censo {
+        void operacion();
+    }
+
+    // Clase CensoDepartamento que implementa la interfaz Censo
+    public static class CensoDepartamento implements Censo {
+
+        private final String departamento;
+        private final int poblacionTotal;
+        private final int cantidadHombres;
+        private final int cantidadMujeres;
+        private final float edadPromedio;
+        private final float ingresoPromedio;
+        private final float temperaturaMedia;
+
+        public CensoDepartamento(String departamento, int poblacionTotal, int cantidadHombres, int cantidadMujeres, float edadPromedio, float ingresoPromedio, float temperaturaMedia) {
+            this.departamento = departamento;
+            this.poblacionTotal = poblacionTotal;
+            this.cantidadHombres = cantidadHombres;
+            this.cantidadMujeres = cantidadMujeres;
+            this.edadPromedio = edadPromedio;
+            this.ingresoPromedio = ingresoPromedio;
+            this.temperaturaMedia = temperaturaMedia;
+        }
+
+        @Override
+        public void operacion() {
+            System.out.println("**Censo Departamento**");
+            System.out.println("Departamento: " + departamento);
+            System.out.println("Población total: " + poblacionTotal);
+            System.out.println("Cantidad de hombres: " + cantidadHombres);
+            System.out.println("Cantidad de mujeres: " + cantidadMujeres);
+            System.out.println("Edad promedio: " + edadPromedio);
+            System.out.println("Ingreso promedio: " + ingresoPromedio);
+            System.out.println("Temperatura media: " + temperaturaMedia);
+            System.out.println();
+        }
+    }
+
+    // Clase CensoNacional que implementa la interfaz Censo
+    public static class CensoNacional implements Censo {
+
+        private final int poblacionTotal;
+        private final int cantidadHombres;
+        private final int cantidadMujeres;
+        private final float edadPromedio;
+        private final float ingresoPromedio;
+        private final float temperaturaMedia;
+
+        public CensoNacional(int poblacionTotal, int cantidadHombres, int cantidadMujeres, float edadPromedio, float ingresoPromedio, float temperaturaMedia) {
+            this.poblacionTotal = poblacionTotal;
+            this.cantidadHombres = cantidadHombres;
+            this.cantidadMujeres = cantidadMujeres;
+            this.edadPromedio = edadPromedio;
+            this.ingresoPromedio = ingresoPromedio;
+            this.temperaturaMedia = temperaturaMedia;
+        }
+
+        @Override
+        public void operacion() {
+            System.out.println("**Censo Nacional**");
+            System.out.println("Población total: " + poblacionTotal);
+            System.out.println("Cantidad de hombres: " + cantidadHombres);
+            System.out.println("Cantidad de mujeres: " + cantidadMujeres);
+            System.out.println("Edad promedio: " + edadPromedio);
+            System.out.println("Ingreso promedio: " + ingresoPromedio);
+            System.out.println("Temperatura media: " + temperaturaMedia);
+            System.out.println();
+        }
+    }
+
+    // Clase abstracta FabricaCensos con método abstracto crearCenso()
+    public static abstract class FabricaCensos {
+        public abstract Censo crearCenso();
+    }
+
+    // Clase FabricaCensoDepartamento que hereda de FabricaCensos
+    public static class FabricaCensoDepartamento extends FabricaCensos {
+
+        @Override
+        public Censo crearCenso() {
+            // Datos de ejemplo para el censo de un departamento
+            return new CensoDepartamento("Antioquia", 26000000, 13000000, 13000000, 35, 2500000, 24);
+        }
+    }
+
+    // Clase FabricaCensoNacional que hereda de FabricaCensos
+    public static class FabricaCensoNacional extends FabricaCensos {
+
+        @Override
+        public Censo crearCenso() {
+            // Datos de ejemplo para el censo nacional
+            return new CensoNacional(50000000, 25000000, 25000000, 30, 3000000, 22);
+        }
+    }
+
+    // Clase CensoFactory que hereda de FabricaCensos y es Singleton
+    public static class CensoFactory extends FabricaCensos {
+
+        private static CensoFactory instance;
+
+        // Constructor privado para evitar instancias adicionales
+        private CensoFactory() {
+        }
+
+        // Método estático para obtener la instancia única
+        public static CensoFactory getInstance() {
+            if (instance == null) {
+                instance = new CensoFactory();
+            }
+            return instance;
+        }
+
+        // Método Factory que crea el tipo de Censo según el parámetro tipoCenso
+        public Censo crearCenso(String tipoCenso) {
+            switch (tipoCenso.toLowerCase()) {
+                case "departamento":
+                    return new FabricaCensoDepartamento().crearCenso();
+                case "nacional":
+                    return new FabricaCensoNacional().crearCenso();
+                default:
+                    throw new IllegalArgumentException("Tipo de censo no soportado.");
+            }
+        }
+
+        // Sobreescribir crearCenso sin parámetro lanzando una excepción, para evitar usos incorrectos
+        @Override
+        public Censo crearCenso() {
+            throw new UnsupportedOperationException("Especifique el tipo de censo a crear.");
+        }
+    }
+
+    // Método principal para probar el código
+    public static void main(String[] args) {
+        // Obtener la única instancia de CensoFactory a través del patrón Singleton
+        CensoFactory factory = CensoFactory.getInstance();
+
+        // Crear un censo departamental y ejecutar su operación
+        Censo censoDepartamento = factory.crearCenso("departamento");
+        censoDepartamento.operacion();
+
+        // Crear un censo nacional y ejecutar su operación
+        Censo censoNacional = factory.crearCenso("nacional");
+        censoNacional.operacion();
+    }
+}
