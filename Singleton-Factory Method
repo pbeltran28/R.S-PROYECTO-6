@@ -1,0 +1,141 @@
+// Clase principal para organizar el código
+public class Main {
+
+    // Interfaz Censo con un método de operación
+    public interface Censo {
+        void operacion();
+    }
+
+    // Clase CensoDepartamento que implementa la interfaz Censo
+    public static class CensoDepartamento implements Censo {
+
+        private final String departamento;
+        private final int poblacionTotal;
+        private final int cantidadHombres;
+        private final int cantidadMujeres;
+        private final float edadPromedio;
+        private final float ingresoPromedio;
+        private final float temperaturaMedia;
+
+        public CensoDepartamento(String departamento, int poblacionTotal, int cantidadHombres, int cantidadMujeres, float edadPromedio, float ingresoPromedio, float temperaturaMedia) {
+            this.departamento = departamento;
+            this.poblacionTotal = poblacionTotal;
+            this.cantidadHombres = cantidadHombres;
+            this.cantidadMujeres = cantidadMujeres;
+            this.edadPromedio = edadPromedio;
+            this.ingresoPromedio = ingresoPromedio;
+            this.temperaturaMedia = temperaturaMedia;
+        }
+
+        @Override
+        public void operacion() {
+            System.out.println("**Censo Departamento**");
+            System.out.println("Departamento: " + departamento);
+            System.out.println("Población total: " + poblacionTotal);
+            System.out.println("Cantidad de hombres: " + cantidadHombres);
+            System.out.println("Cantidad de mujeres: " + cantidadMujeres);
+            System.out.println("Edad promedio: " + edadPromedio);
+            System.out.println("Ingreso promedio: " + ingresoPromedio);
+            System.out.println("Temperatura media: " + temperaturaMedia);
+            System.out.println();
+        }
+    }
+
+    // Clase CensoNacional que implementa la interfaz Censo
+    public static class CensoNacional implements Censo {
+
+        private final int poblacionTotal;
+        private final int cantidadHombres;
+        private final int cantidadMujeres;
+        private final float edadPromedio;
+        private final float ingresoPromedio;
+        private final float temperaturaMedia;
+
+        public CensoNacional(int poblacionTotal, int cantidadHombres, int cantidadMujeres, float edadPromedio, float ingresoPromedio, float temperaturaMedia) {
+            this.poblacionTotal = poblacionTotal;
+            this.cantidadHombres = cantidadHombres;
+            this.cantidadMujeres = cantidadMujeres;
+            this.edadPromedio = edadPromedio;
+            this.ingresoPromedio = ingresoPromedio;
+            this.temperaturaMedia = temperaturaMedia;
+        }
+
+        @Override
+        public void operacion() {
+            System.out.println("**Censo Nacional**");
+            System.out.println("Población total: " + poblacionTotal);
+            System.out.println("Cantidad de hombres: " + cantidadHombres);
+            System.out.println("Cantidad de mujeres: " + cantidadMujeres);
+            System.out.println("Edad promedio: " + edadPromedio);
+            System.out.println("Ingreso promedio: " + ingresoPromedio);
+            System.out.println("Temperatura media: " + temperaturaMedia);
+            System.out.println();
+        }
+    }
+
+    // Clase abstracta FabricaCensos con método abstracto crearCenso()
+    public static abstract class FabricaCensos {
+        public abstract Censo crearCenso();
+    }
+
+    // Clase FabricaCensoDepartamento que hereda de FabricaCensos
+    public static class FabricaCensoDepartamento extends FabricaCensos {
+
+        @Override
+        public Censo crearCenso() {
+            // Datos de ejemplo para el censo de un departamento
+            String departamento = "Antioquia";
+            int poblacionTotal = 26000000;
+            int cantidadHombres = 13000000;
+            int cantidadMujeres = 13000000;
+            float edadPromedio = 35;
+            float ingresoPromedio = 2500000;
+            float temperaturaMedia = 24;
+
+            return new CensoDepartamento(departamento, poblacionTotal, cantidadHombres, cantidadMujeres, edadPromedio, ingresoPromedio, temperaturaMedia);
+        }
+    }
+
+    // Clase FabricaCensoNacional que hereda de FabricaCensos
+    public static class FabricaCensoNacional extends FabricaCensos {
+
+        @Override
+        public Censo crearCenso() {
+            // Datos de ejemplo para el censo nacional
+            int poblacionTotal = 50000000;
+            int cantidadHombres = 25000000;
+            int cantidadMujeres = 25000000;
+            float edadPromedio = 30;
+            float ingresoPromedio = 3000000;
+            float temperaturaMedia = 22;
+
+            return new CensoNacional(poblacionTotal, cantidadHombres, cantidadMujeres, edadPromedio, ingresoPromedio, temperaturaMedia);
+        }
+    }
+
+    // Clase CensoFactory para crear censos usando Factory Method
+    public static class CensoFactory {
+
+        // Método que recibe un tipo de censo y devuelve un objeto Censo
+        public static Censo crearCenso(String tipoCenso) {
+            if (tipoCenso.equalsIgnoreCase("departamento")) {
+                return new FabricaCensoDepartamento().crearCenso();
+            } else if (tipoCenso.equalsIgnoreCase("nacional")) {
+                return new FabricaCensoNacional().crearCenso();
+            } else {
+                throw new IllegalArgumentException("Tipo de censo no soportado.");
+            }
+        }
+    }
+
+    // Método principal para probar el código
+    public static void main(String[] args) {
+        // Crear un censo departamental y ejecutar su operación
+        Censo censoDepartamento = CensoFactory.crearCenso("departamento");
+        censoDepartamento.operacion();
+
+        // Crear un censo nacional y ejecutar su operación
+        Censo censoNacional = CensoFactory.crearCenso("nacional");
+        censoNacional.operacion();
+    }
+}
