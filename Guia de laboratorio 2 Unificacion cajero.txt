@@ -1,0 +1,168 @@
+#ESTA ES LA PAGINA CON EL CODIGO EJECUTABLE      https://onlinegdb.com/SpygTzymS
+
+
+import java.util.ArrayList;
+import java.util.Iterator;
+
+enum TipoTransaccion {
+    RETIRO,
+    DEPOSITO,
+    CONSULTA_SALDO
+}
+
+interface Manejador {
+    void procesarSolicitud(Transaccion transaccion);
+    void establecerSiguienteManejador(Manejador siguienteManejador);
+}
+
+class Transaccion {
+    private TipoTransaccion tipo;
+
+    public Transaccion(TipoTransaccion tipo) {
+        this.tipo = tipo;
+    }
+
+    public TipoTransaccion obtenerTipo() {
+        return tipo;
+    }
+}
+
+class ManejadorRetiro implements Manejador {
+    private Manejador siguienteManejador;
+
+    @Override
+    public void procesarSolicitud(Transaccion transaccion) {
+        if (transaccion.obtenerTipo() == TipoTransaccion.RETIRO)
+            System.out.println("Procesando un retiro");
+        else
+            siguienteManejador.procesarSolicitud(transaccion);
+    }
+
+    @Override
+    public void establecerSiguienteManejador(Manejador siguienteManejador) {
+        this.siguienteManejador = siguienteManejador;
+    }
+}
+
+class ManejadorDeposito implements Manejador {
+    private Manejador siguienteManejador;
+
+    @Override
+    public void procesarSolicitud(Transaccion transaccion) {
+        if (transaccion.obtenerTipo() == TipoTransaccion.DEPOSITO)
+            System.out.println("Procesando un deposito");
+        else
+            siguienteManejador.procesarSolicitud(transaccion);
+    }
+
+    @Override
+    public void establecerSiguienteManejador(Manejador siguienteManejador) {
+        this.siguienteManejador = siguienteManejador;
+    }
+}
+
+class ManejadorConsultaSaldo implements Manejador {
+    private Manejador siguienteManejador;
+
+    @Override
+    public void procesarSolicitud(Transaccion transaccion) {
+        if (transaccion.obtenerTipo() == TipoTransaccion.CONSULTA_SALDO)
+            System.out.println("Procesando una consulta del saldo");
+        else
+            siguienteManejador.procesarSolicitud(transaccion);
+    }
+
+    @Override
+    public void establecerSiguienteManejador(Manejador siguienteManejador) {
+        this.siguienteManejador = siguienteManejador;
+    }
+}
+
+class ServicioCajero {
+    private Manejador manejadorRetiro;
+    private Manejador manejadorDeposito;
+    private Manejador manejadorConsultaSaldo;
+
+    public ServicioCajero() {
+        manejadorRetiro = new ManejadorRetiro();
+        manejadorDeposito = new ManejadorDeposito();
+        manejadorConsultaSaldo = new ManejadorConsultaSaldo();
+
+        manejadorRetiro.establecerSiguienteManejador(manejadorDeposito);
+        manejadorDeposito.establecerSiguienteManejador(manejadorConsultaSaldo);
+    }
+
+    public void procesarTransaccion(Transaccion transaccion) {
+        manejadorRetiro.procesarSolicitud(transaccion);
+    }
+}
+
+class BilleteDisponible {
+    private int valor;
+
+    public BilleteDisponible(int valor) {
+        this.valor = valor;
+    }
+
+    public int getValor() {
+        return this.valor;
+    }
+}
+
+class CajeroAutomatico {
+    private ArrayList<BilleteDisponible> billetes;
+    private int saldoTotal;
+
+    public CajeroAutomatico() {
+        this.billetes = new ArrayList<>();
+        this.saldoTotal = 0;
+    }
+
+    public void agregarBillete(BilleteDisponible billete) {
+        this.billetes.add(billete);
+        this.saldoTotal += billete.getValor();
+    }
+
+    public void dispensarDinero(int monto) {
+        Iterator<BilleteDisponible> iterator = this.billetes.iterator();
+        int montoRestante = monto;
+
+        while (iterator.hasNext() && montoRestante > 0) {
+            BilleteDisponible billete = iterator.next();
+            if (billete.getValor() <= montoRestante) {
+                montoRestante -= billete.getValor();
+                iterator.remove();
+            }
+        }
+
+        if (montoRestante > 0) {
+            System.out.println("No se pudo dispensar el monto solicitado");
+        } else {
+            this.saldoTotal -= monto;
+            System.out.println("Su dinero ha sido entregado exitosamente");
+        }
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        ServicioCajero servicioCajero = new ServicioCajero();
+
+        Transaccion transaccionRetiro = new Transaccion(TipoTransaccion.RETIRO);
+        servicioCajero.procesarTransaccion(transaccionRetiro);
+
+        Transaccion transaccionDeposito = new Transaccion(TipoTransaccion.DEPOSITO);
+        servicioCajero.procesarTransaccion(transaccionDeposito);
+
+        Transaccion transaccionConsultaSaldo = new Transaccion(TipoTransaccion.CONSULTA_SALDO);
+        servicioCajero.procesarTransaccion(transaccionConsultaSaldo);
+
+        CajeroAutomatico cajero = new CajeroAutomatico();
+        cajero.agregarBillete(new BilleteDisponible(10));
+        cajero.agregarBillete(new BilleteDisponible(20));
+        cajero.agregarBillete(new BilleteDisponible(50));
+        cajero.agregarBillete(new BilleteDisponible(100));
+
+        cajero.dispensarDinero(30);
+    }
+}
