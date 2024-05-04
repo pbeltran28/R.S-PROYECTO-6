@@ -1,0 +1,120 @@
+//CÓDIGO INICIAL ENVIADO (FALENCIA EN LA IMPLEMENTACIÓN, FUNCIONA PERO SE REALIZO NO COMO EL PROFESOR PIDIÓ)
+//https://www.onlinegdb.com/NJeWEbgAs
+
+//CÓDIGO DE CORRECCIÓN CON SUS OBSERVACIONES
+//https://onlinegdb.com/Axi8BYFOWl
+
+// Interfaz Command
+interface Command {
+    void ejecutar();
+}
+
+// Comando concreto 1
+class RetirarDinero implements Command {
+    private CajeroAutomatico cajero;
+    private double monto;
+
+    public RetirarDinero(CajeroAutomatico cajero, double monto) {
+        this.cajero = cajero;
+        this.monto = monto;
+    }
+
+    @Override
+    public void ejecutar() {
+        cajero.retirarDinero(monto);
+    }
+}
+
+// Comando concreto 2
+class ConsultarSaldo implements Command {
+    private CajeroAutomatico cajero;
+
+    public ConsultarSaldo(CajeroAutomatico cajero) {
+        this.cajero = cajero;
+    }
+
+    @Override
+    public void ejecutar() {
+        cajero.consultarSaldo();
+    }
+}
+
+// Comando concreto 3 (Agregado con lo que menciono usted)
+class DepositaDinero implements Command {
+    private CajeroAutomatico cajero;
+    private double monto;
+
+    public DepositaDinero(CajeroAutomatico cajero, double monto) {
+        this.cajero = cajero;
+        this.monto = monto;
+    }
+
+    @Override
+    public void ejecutar() {
+        cajero.depositaDinero(monto);
+    }
+}
+
+// Receptor
+class CajeroAutomatico {
+    private double saldo;
+
+    public CajeroAutomatico(double saldoInicial) {
+        this.saldo = saldoInicial;
+    }
+
+    public void retirarDinero(double monto) {
+        if (monto <= saldo) {
+            saldo -= monto;
+            System.out.println("Se ha retirado $" + monto);
+        } else {
+            System.out.println("Saldo insuficiente");
+        }
+    }
+
+    public void consultarSaldo() {
+        System.out.println("El saldo actual es: $" + saldo);
+    }
+
+    // Método para depositar dinero. Igual debe ir aca este metodo. Para que lo tenga en cuenta.
+    public void depositaDinero(double monto) {
+        saldo += monto;
+        System.out.println("Se ha depositado $" + monto);
+    }
+}
+
+// Invoker
+class TerminalCajero {
+    private Command comando;
+
+    public void setComando(Command comando) {
+        this.comando = comando;
+    }
+
+    public void ejecutarComando() {
+        comando.ejecutar();
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        CajeroAutomatico cajero = new CajeroAutomatico(10000);
+        TerminalCajero terminal = new TerminalCajero();
+
+        // Retirar dinero
+        terminal.setComando(new RetirarDinero(cajero, 100));
+        terminal.ejecutarComando();
+
+        // Consultar saldo
+        terminal.setComando(new ConsultarSaldo(cajero));
+        terminal.ejecutarComando();
+        
+        // Deposita dinero en cajero
+        terminal.setComando(new DepositaDinero(cajero, 200));
+        terminal.ejecutarComando();
+
+        // Consultar nuevamente el saldo de dinero
+        terminal.setComando(new ConsultarSaldo(cajero));
+        terminal.ejecutarComando();
+    }
+}
