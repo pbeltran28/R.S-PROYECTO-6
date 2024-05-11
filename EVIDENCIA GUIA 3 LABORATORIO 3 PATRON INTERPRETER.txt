@@ -1,0 +1,125 @@
+/* https://onlinegdb.com/r1MPYDrD5  */
+
+import java.util.Scanner;
+
+// Interfaz para el patrón Interpreter
+interface Expression {
+    void interpret(CajeroAutomatico context);
+}
+
+// Expresión concreta 1
+class RetirarDinero implements Expression {
+    private double monto;
+
+    public RetirarDinero(double monto) {
+        this.monto = monto;
+    }
+
+    @Override
+    public void interpret(CajeroAutomatico context) {
+        context.retirarDinero(monto);
+    }
+}
+
+// Expresión concreta 2
+class ConsultarSaldo implements Expression {
+
+    @Override
+    public void interpret(CajeroAutomatico context) {
+        context.consultarSaldo();
+    }
+}
+
+// Expresión concreta 3
+class DepositaDinero implements Expression {
+    private double monto;
+
+    public DepositaDinero(double monto) {
+        this.monto = monto;
+    }
+
+    @Override
+    public void interpret(CajeroAutomatico context) {
+        context.depositaDinero(monto);
+    }
+}
+
+// Contexto
+class CajeroAutomatico {
+    private double saldo;
+
+    public CajeroAutomatico(double saldoInicial) {
+        this.saldo = saldoInicial;
+    }
+
+    public void retirarDinero(double monto) {
+        if (monto <= saldo) {
+            saldo -= monto;
+            System.out.println("Se ha retirado $" + monto);
+            consultarSaldo();
+        } else {
+            System.out.println("Saldo insuficiente");
+        }
+    }
+
+    public void consultarSaldo() {
+        System.out.println("El saldo actual es: $" + saldo+'\n');
+    }
+
+    public void depositaDinero(double monto) {
+        saldo += monto;
+        System.out.println("Se ha depositado $" + monto);
+        consultarSaldo();
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        CajeroAutomatico cajero = new CajeroAutomatico(10000);
+        Scanner scanner = new Scanner(System.in);
+
+        while (true) {
+            System.out.println("Por favor, elige una opción:");
+            System.out.println("1. Retirar dinero");
+            System.out.println("2. Consultar saldo");
+            System.out.println("3. Depositar dinero");
+            System.out.println("4. Salir \n");
+            System.out.print("Digite la Opción: ");
+            while (!scanner.hasNextInt()) {
+                System.out.println("Eso no es un número válido. Intenta de nuevo.\n");
+                scanner.next();
+            }
+            int opcion = scanner.nextInt();
+
+            switch (opcion) {
+                case 1:
+                    System.out.print("Ingresa el monto a retirar: ");
+                    while (!scanner.hasNextDouble()) {
+                        System.out.println("Eso no es un número válido. Intenta de nuevo.\n");
+                        scanner.next();
+                    }
+                    double montoRetiro = scanner.nextDouble();
+                    new RetirarDinero(montoRetiro).interpret(cajero);
+                    break;
+                case 2:
+                    new ConsultarSaldo().interpret(cajero);
+                    break;
+                case 3:
+                    System.out.print("Ingresa el monto a depositar: ");
+                    while (!scanner.hasNextDouble()) {
+                        System.out.println("Eso no es un número válido. Intenta de nuevo.\n");
+                        scanner.next();
+                    }
+                    double montoDeposito = scanner.nextDouble();
+                    new DepositaDinero(montoDeposito).interpret(cajero);
+                    break;
+                case 4:
+                    System.out.println("\nGracias por usar nuestro cajero automático. ¡Hasta luego!");
+                    scanner.close();
+                    return;
+                default:
+                    System.out.println("Opción no válida. Por favor, intenta de nuevo.\n");
+            }
+        }
+    }
+}
