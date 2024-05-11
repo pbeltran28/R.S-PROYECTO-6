@@ -1,0 +1,170 @@
+/*  https://onlinegdb.com/8h5Kvr1tS  */
+
+// Interfaz Command
+import java.util.Scanner;
+interface Command {
+    void ejecutar();
+}
+
+// Interfaz Interpreter
+interface Expression {
+    double interpret();
+}
+
+// Comando concreto 1 (retirar dinero implementando patron de diseño interpreter)
+class RetirarDinero implements Command, Expression {
+    private CajeroAutomatico cajero;
+    private double monto;
+
+    public RetirarDinero(CajeroAutomatico cajero, double monto) {
+        this.cajero = cajero;
+        this.monto = monto;
+    }
+
+    @Override
+    public void ejecutar() {
+        cajero.retirarDinero(interpret());
+    }
+
+    @Override
+    public double interpret() {
+        return this.monto;
+    }
+}
+
+// Comando concreto 2
+class ConsultarSaldo implements Command {
+    private CajeroAutomatico cajero;
+
+    public ConsultarSaldo(CajeroAutomatico cajero) {
+        this.cajero = cajero;
+    }
+
+    @Override
+    public void ejecutar() {
+        cajero.consultarSaldo();
+    }
+}
+
+// Comando concreto 3
+class DepositaDinero implements Command, Expression {
+    private CajeroAutomatico cajero;
+    private double monto;
+
+    public DepositaDinero(CajeroAutomatico cajero, double monto) {
+        this.cajero = cajero;
+        this.monto = monto;
+    }
+
+    @Override
+    public void ejecutar() {
+        cajero.depositaDinero(interpret());
+    }
+
+    @Override
+    public double interpret() {
+        return this.monto;
+    }
+}
+
+// Invoker
+class TerminalCajero {
+    private Command comando;
+
+    public void setComando(Command comando) {
+        this.comando = comando;
+    }
+
+    public void ejecutarComando() {
+        comando.ejecutar();
+    }
+}
+
+// Receptor
+class CajeroAutomatico {
+    private double saldo;
+
+    public CajeroAutomatico(double saldoInicial) {
+        this.saldo = saldoInicial;
+    }
+
+    public void retirarDinero(double monto) {
+        if (monto <= saldo) {
+            saldo -= monto;
+            System.out.println("Se ha retirado $" + monto);
+            consultarSaldo();
+        } else {
+            System.out.println("Saldo insuficiente");
+        }
+    }
+
+    public void consultarSaldo() {
+        System.out.println("El saldo actual es: $" + saldo);
+    }
+
+    public void depositaDinero(double monto) {
+        saldo += monto;
+        System.out.println("Se ha depositado $" + monto);
+        consultarSaldo();
+    }
+}
+
+
+
+/*Se realiza una mejora para que el usuario tenga un menu y cada vez que retire o deposite
+le muestre el saldo*/
+
+public class Main {
+    public static void main(String[] args) {
+        CajeroAutomatico cajero = new CajeroAutomatico(10000);
+        TerminalCajero terminal = new TerminalCajero();
+        Scanner scanner = new Scanner(System.in);
+
+        while (true) {
+            System.out.println("Por favor, elige una opción:\n");
+            System.out.println("1. Retirar dinero");
+            System.out.println("2. Consultar saldo");
+            System.out.println("3. Depositar dinero");
+            System.out.println("4. Salir");
+            System.out.print("Digite la Opción: \n");
+            while (!scanner.hasNextInt()) {
+                System.out.println("Eso no es un número válido. Intenta de nuevo.");
+                scanner.next();
+            }
+            int opcion = scanner.nextInt();
+
+            switch (opcion) {
+                case 1:
+                    System.out.print("Ingresa el monto a retirar: ");
+                    while (!scanner.hasNextDouble()) {
+                        System.out.println("Eso no es un número válido. Intenta de nuevo.");
+                        scanner.next();
+                    }
+                    double montoRetiro = scanner.nextDouble();
+                    terminal.setComando(new RetirarDinero(cajero, montoRetiro));
+                    terminal.ejecutarComando();
+                    break;
+                case 2:
+                    terminal.setComando(new ConsultarSaldo(cajero));
+                    terminal.ejecutarComando();
+                    break;
+                case 3:
+                    System.out.print("Ingresa el monto a depositar: ");
+                    while (!scanner.hasNextDouble()) {
+                        System.out.println("Eso no es un número válido. Intenta de nuevo.");
+                        scanner.next();
+                    }
+                    double montoDeposito = scanner.nextDouble();
+                    terminal.setComando(new DepositaDinero(cajero, montoDeposito));
+                    terminal.ejecutarComando();
+                    break;
+                case 4:
+                    System.out.println("Gracias por usar nuestro cajero automático. ¡Hasta luego!");
+                    scanner.close();
+                    return;
+                default:
+                    System.out.println("Opción no válida. Por favor, intenta de nuevo.");
+            }
+        }
+    }
+}
